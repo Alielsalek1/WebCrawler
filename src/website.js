@@ -4,14 +4,19 @@ class Website {
     }
     getHostname(root) {
         try {
-            root = new URL(root);
-            let hostname = root.hostname;
-            if (hostname[-1] === '/') hostname = hostname.slice(0, -1);
-            if (hostname.startsWith('www.')) hostname = hostname.slice(4);
-            return hostname;
+            const siteRoot = new URL(root);
+            
+            //converting the URL to string to remove 'www.'
+            let rootStr = siteRoot.href;
+
+            //remove 'www.' if present
+            if (rootStr.includes('www.')) 
+                rootStr = rootStr.replace('www.', '');
+
+            return rootStr
         }
         catch(err) {
-            console.log(err);
+            console.log(`Error: ${err}`);
             return undefined;
         }
     }
