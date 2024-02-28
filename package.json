@@ -14,5 +14,9 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "jsdom": "^24.0.0",
+    "node-fetch": "^3.3.2"
   }
 }
