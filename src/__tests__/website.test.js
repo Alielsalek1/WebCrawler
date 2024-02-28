@@ -36,3 +36,7 @@ test('invalid URLs', async () => {
     let site = new Website("Invalid");
     expect(site.root).toEqual(undefined);
 });
+test('URL in tests', async () => {
+    let site = new Website('https://mohamed-amr7.github.io/Movie-Search-App/');
+    expect(site.root).toEqual('https://mohamed-amr7.github.io/Movie-Search-App/');
+});
