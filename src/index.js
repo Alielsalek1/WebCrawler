@@ -4,9 +4,9 @@ const CrawlManager = require('./crawlManager.js');
 async function main() {
     console.log("App Start");
 
-    const site = new Website('https://mohamed-amr7.github.io/Movie-Search-App/');
+    const site = new Website('https://stackoverflow.com/');
     const crawler = new CrawlManager(site);
-    crawler.crawl();
+    await crawler.crawl();
 }
 
 main();
