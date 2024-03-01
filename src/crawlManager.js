@@ -1,5 +1,4 @@
 const { JSDOM } = require("jsdom");
-const fetch = require("node-fetch");
 const puppeter = require('puppeteer');
 
 class CrawlManager {
@@ -11,9 +10,7 @@ class CrawlManager {
         this.totalImgCount = 0;
         this.totalLinks = 0;
         this.totalCrawlTime = 0;
-        this.internalLinks = [];
         this.externalLinks = [];
-        this.brokenLinks = [];
         this.linkCnt = new Map();
         this.pageCrawlTime = new Map();
     }
@@ -49,18 +46,6 @@ class CrawlManager {
     }
     async crawl() {
         console.log(`Starting Business!!`);
-        try {
-            //getting the HTML text
-            const htmlText = await this.getHtml(this.website);
-
-            //setting the page title with dom
-            const dom = new JSDOM(htmlText);
-
-            //setting the page Title
-            this.title = dom.title; 
-        } catch(err) {
-            console.log(`Error: ${err}`);
-        }
 
         //crawling!!!
         this.crawlPage(this.website);
@@ -94,9 +79,21 @@ class CrawlManager {
             //declaring the DOM
             const dom = new JSDOM(htmlText);
 
+            //getting the page's title
+            if (depth === 0)
+                this.title = dom.title; 
+
             //adding to the variables computing total attributes in the Website
             this.totalImgCount += dom.window.document.querySelectorAll('img').length;
-            this.totalWordCount += 0;
+            
+            /*getting all HTMl tags as each element is a single instance.
+              EX: if we have 3 <p> then the 3 instances of P will be included each as an element */
+            const allElements = dom.window.document.querySelectorAll("*");
+            for (const element of allElements) {
+                const text = element.textContent; //Get text content
+                const words = text.split(/\s+/); //Split into words using regex for whitespace
+                this.totalWordCount += words.length; //Count words
+            }
 
             //getting the all links from the DOM
             let links = dom.window.document.querySelectorAll('a');
@@ -108,10 +105,10 @@ class CrawlManager {
 
                     // if the the current URL has the same hostname as the root hostname then they are on the same page
                     if (l1.hostname === l2.hostname) {
-                        this.crawlPage(l1);
+                        this.crawlPage(l1, depth + 1);
                     }
                     else
-                        this.externalLinks.push(link.getAttribute('href'));
+                        this.externalLinks.push(link.getAttribute('href')); //append the link to external links array
                 }  
             });
         }
@@ -123,6 +120,7 @@ class CrawlManager {
         this.totalCrawlTime += crawlTime; //adding the page crawlTime to the totalCrawlTime
         this.pageCrawlTime.set(page, crawlTime) //mapping the page to its crawlTime
 
+        //temp testing
         console.log(this.totalCrawlTime)
         console.log(this.totalImgCount)
         console.log(this.totalLinks)
